@@ -25,7 +25,8 @@ let StickyNavigation = {
     getDefaultProps() {
         return ({
             titleSelector: '[data-menu]',
-            scrolledElementSelector: 'body'
+            scrolledElementSelector: 'body',
+            hasBackToTop: true
         });
     },
     /**
@@ -35,7 +36,8 @@ let StickyNavigation = {
         titleSelector: type('string'),
         scrolledElementSelector: type('string'),
         triggerHeight: type('number'),
-        style: type('object')
+        style: type('object'),
+        hasBackToTop: type('bool')
     },
     /**
      * Component did mount, attach the scroll spy
@@ -44,8 +46,10 @@ let StickyNavigation = {
         this.setState({
             titleList: this._getTitleList()
         });
+        //todo: @stan Maybe put this in the componentWillMount
         this._scrollCarrier = this.props.scrollSpyTargetSelector ? document.querySelector(this.props.scrollSpyTargetSelector) : document;
         this._attachScrollSpy();
+        //
         this._scrollSpy();
     },
     /**
@@ -61,11 +65,11 @@ let StickyNavigation = {
      */
     _getTitleList() {
         let rawTitleList = document.querySelectorAll(this.props.titleSelector);
-        return [].map.call(rawTitleList, (titleElement) => {
+        return [].map.call(rawTitleList, (titleElement, titleIndex) => {
             return {
                 label: titleElement.innerText,
                 id: titleElement.getAttribute('id'),
-                offsetTop: titleElement.offsetTop,
+                offsetTop: titleIndex === 0 ? 0 : titleElement.offsetTop,
                 offsetHeight: titleElement.parentElement.offsetHeight
             }
         });
@@ -136,7 +140,7 @@ let StickyNavigation = {
      */
     render() {
         return (
-            <nav data-focus='sticky-navigation' className={this._getStyleClassName()}>
+            <nav data-focus='sticky-navigation' className={this._getStyleClassName()} data-spy="affix" data-offset-top="0" data-offset-bottom="0">
                 {this._renderList()}
             </nav>
         )

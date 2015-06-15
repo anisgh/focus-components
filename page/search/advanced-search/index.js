@@ -11,7 +11,7 @@ let includes = require('lodash/collection/includes');
 let FacetBox = require('../../../search/facet-box').component;
 let ListActionBar = require('../../../list/action-bar/index').component;
 let ListSummary = require('../../../list/summary/index').component;
-
+let BackToTopComponent = require('../../../common/button/back-to-top').component;
 // Store
 
 let SearchStore = require('focus').store.SearchStore;
@@ -54,19 +54,16 @@ let AdvancedSearch = {
             facetConfig: {},
             idField: 'id', //To remove?
             isSelection: true,
-            criteria: {
-                scope: undefined,
-                searchText: undefined
-            },
-            exportAction: undefined,
-            unselectedScopeAction: undefined
+            hasBackToTop: true,
+            BackToTopComponent: BackToTopComponent
         };
     },
     propTypes: {
         facetConfig: type('object'),
         idField: type('string'),
         isSelection: type('bool'),
-        criteria: type('object'),
+        scope: type('string'),
+        query: type('string'),
         exportAction: type(['function', 'object']),
         unselectedScopeAction: type(['function', 'object'])
     },
@@ -234,7 +231,7 @@ let AdvancedSearch = {
      * Click on scope action handler.
      */
     _scopeClick() {
-        this.props.unselectedScopeAction();
+        this.props.unselectScopeAction();
     },
     /**
      * Action on line click.
@@ -287,12 +284,12 @@ let AdvancedSearch = {
      * @returns {XML} Htm code.
      */
     getListSummaryComponent() {
-        let scopeList = {scope: this.props.criteria.scope};
+        let scopeList = {scope: this.props.scope};
         return (
             <ListSummary
                 data-focus='advanced-search-list-summary'
                 nb={this.state.totalRecords}
-                queryText={this.props.criteria.searchText}
+                queryText={this.props.query}
                 scopeList={scopeList}
                 scopeClickAction={this._scopeClick}
                 exportAction={this._exportHandler}/>
@@ -333,6 +330,7 @@ let AdvancedSearch = {
                     {this.getActionBarComponent()}
                     {this.getResultListComponent(true)}
                 </div>
+                {this.props.hasBackToTop && <this.props.BackToTopComponent/>}
             </div>
         );
     }
