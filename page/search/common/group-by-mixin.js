@@ -13,6 +13,7 @@ let ListSelection = require('../../../list/selection').list.component;
 // Mixins
 
 let i18nMixin = require('../../../common/i18n/mixin');
+
 //Empty Result component to be mututalized.
 let EmptyComponent = React.createClass({
     mixins: [i18nMixin],
@@ -23,7 +24,8 @@ let EmptyComponent = React.createClass({
                 </div>
             );
     }
-})
+});
+
 /**
  * Mixin used in order to create a block.
  * @type {Object}
@@ -58,7 +60,7 @@ let GroupByMixin = {
     getResultListComponent(advancedSearch) {
         // First check if there is any result
         if (this.state.totalRecords === 0) {
-            return this.props.emptyComponent;
+            return <this.props.emptyComponent />;
         }
         let isBounded = keys(this.state.map).length > 1;
         let noDecoration = keys(this.state.map).length === 1;
@@ -66,26 +68,25 @@ let GroupByMixin = {
             let groupKey = keys(this.state.map)[0];
             return this._getSingleTypeResultList(groupKey, this.state.map[groupKey], isBounded && this.props.groupMaxRows);
         } else {
-            let groupList = keys(this.state.map).map((groupKey) => {
-                return (
-                    <SingleGroupComponent
-                        data-focus='results-group'
-                        key={groupKey}
-                        ref={groupKey}
-                        renderGroupBy={this.renderGroupByBlock}
-                        list={this.state.map[groupKey]}
-                        groupKey={groupKey}
-                        maxRows={isBounded && this.props.groupMaxRows}
-                        />
-                );
-            });
-            return groupList;
+            return keys(this.state.map).reduce((groupList, groupKey) => {
+                if (this.state.map[groupKey].length > 0) {
+                    groupList.push(
+                        <SingleGroupComponent
+                            data-focus='results-group'
+                            key={groupKey}
+                            ref={groupKey}
+                            renderGroupBy={this.renderGroupByBlock}
+                            list={this.state.map[groupKey]}
+                            groupKey={groupKey}
+                            maxRows={isBounded && this.props.groupMaxRows}
+                            />
+                    );
+                }
+                return groupList;
+            }, []);
         }
     },
     _getSingleTypeResultList(groupKey, list, maxRows) {
-        if (list.length === 0) {
-            return <this.emptyComponent />;
-        }
         if (maxRows) {
             list = list.slice(0, maxRows);
         }
@@ -111,7 +112,7 @@ let GroupByMixin = {
     renderGroupByBlock(groupKey, list, maxRows) {
         let GroupWrapper = this.props.groupComponent;
         return (
-            <GroupWrapper data-focus="group-result-container" groupKey={groupKey} query={this.state.query} showAll={this.changeGroupByMaxRows}>
+            <GroupWrapper data-focus="group-result-container" groupKey={groupKey} query={this.state.query} showAll={this.showAllGroupListHandler}>
                 {this._getSingleTypeResultList(groupKey, list, maxRows)}
             </GroupWrapper>
         );
