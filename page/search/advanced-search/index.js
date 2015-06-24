@@ -85,7 +85,7 @@ let AdvancedSearch = {
      */
     getInitialState() {
         return assign({
-            facetList: {},
+            facetList: this.props.store.getFacet() || {},
             selectedFacetList: {},
             openedFacetList: this.props.openedFacetList,
             selectionStatus: 'none',
@@ -171,7 +171,10 @@ let AdvancedSearch = {
 
         this.setState(
             assign(
-                {selectedFacetList: selectedFacetList},
+                {
+                    selectedFacetList: selectedFacetList,
+                    groupSelectedKey: undefined
+                },
                 this.getNoFetchState())
             , this.search);
     },
