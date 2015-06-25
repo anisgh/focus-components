@@ -54,6 +54,16 @@ let lettersFilterMixin = {
         }
     },
 
+    /** @inheritdoc */
+    componentWillReceiveProps(newProps){
+        this.setState(
+            {
+                selectedLetter: newProps.selectedLetter,
+                availableLetters: newProps.availableLetters
+            }
+        );
+    },
+
     /**
      * Handle letter selection.
      * @private
@@ -112,7 +122,8 @@ let lettersFilterMixin = {
                 var elementClassName = `${isLetterAvailable ? '': 'disabled'} ${this._getSelectedStyle(letter, this.state.selectedLetter)}`;
 
                 return (
-                    <button ref={letter}
+                    <button key={letter}
+                            ref={letter}
                             onClick={this._selectionFunction}
                             className={elementClassName}
                             data-focus='letter-element'
